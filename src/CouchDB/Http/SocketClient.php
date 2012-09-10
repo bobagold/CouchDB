@@ -1,6 +1,8 @@
 <?php
 namespace CouchDB\Http;
 
+use CouchDB\Exception\HttpException;
+
 /**
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  */
@@ -34,9 +36,11 @@ class SocketClient extends AbstractClient
     public function connect()
     {
         $this->resource = fsockopen($this->getOption('host'), $this->getOption('port'), $errno, $errstr, $this->getOption('timeout'));
+
         if (!$this->resource) {
             $this->resource = null;
-            throw new \RuntimeException(sprintf('Unable to connect to %s (%s)', $this->getOption('host'), $errstr));
+
+            throw HttpException::connectFailure($this->getOption('host'), $this->getOption('port'), $errno, $errstr);
         }
     }
 

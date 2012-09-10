@@ -1,6 +1,8 @@
 <?php
 namespace CouchDB\Http;
 
+use CouchDB\Exception\HttpException;
+
 /**
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  */
@@ -76,7 +78,12 @@ class StreamClient extends AbstractClient
         );
 
         if (!$resource) {
-            throw new \RuntimeException(sprintf('Unable to open the connection to', $this->getOption('host')));
+            throw HttpException::connectFailure(
+                $this->getOption('host'),
+                $this->getOption('port'),
+                0,
+                error_get_last()
+            );
         }
 
         $body = '';
