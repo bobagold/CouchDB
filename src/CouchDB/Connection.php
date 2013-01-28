@@ -221,6 +221,9 @@ class Connection
         if (404 === $response->getStatusCode()) {
             throw new \RuntimeException(sprintf('The database %s does not exist', $name));
         }
+        if (200 != $response->getStatusCode()) {
+            throw new \RuntimeException(sprintf('Unkown response %d', $response->getStatusCode()));
+        }
 
         $db = $this->wrapDatabase($name);
 
@@ -243,8 +246,11 @@ class Connection
         if (404 === $response->getStatusCode()) {
             return false;
         }
+        if (200 == $response->getStatusCode()) {
+            return true;
+        }
 
-        return true;
+        throw new \RuntimeException(sprintf('Unkown response %d', $response->getStatusCode()));
     }
 
     /**
