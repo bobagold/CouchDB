@@ -135,6 +135,31 @@ class Database
         return $value;
     }
 
+    public function view($design, $view, $limit = null, $offset = null, $startKey = null) {
+        $this->conn->initialize();
+
+        $path = "/{$this->name}/_design/$design/_view/$view?include_docs=true";
+
+        if (null !== $limit) {
+            $path .= '&limit=' . (integer) $limit;
+        }
+        if (null !== $offset) {
+            $path .= '&skip=' . (integer) $offset;
+        }
+        if (null !== $startKey) {
+            $path .= '&startkey=' . (string) $startKey;
+        }
+
+        $response = $this->conn->getClient()->request($path);
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException('view not found');
+        }
+        $json = $response->getContent();
+        $docs = JSONEncoder::decode($json);
+
+        return $docs;
+    }
+
     /**
      * Insert a new document.
      *
