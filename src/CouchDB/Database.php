@@ -135,20 +135,20 @@ class Database
         return $value;
     }
 
-    public function view($design, $view, $limit = null, $offset = null, $startKey = null) {
+    public function view($design, $view, array $params = array()) {
         $this->conn->initialize();
 
-        $path = "/{$this->name}/_design/$design/_view/$view?include_docs=true";
-
-        if (null !== $limit) {
-            $path .= '&limit=' . (integer) $limit;
-        }
-        if (null !== $offset) {
-            $path .= '&skip=' . (integer) $offset;
-        }
-        if (null !== $startKey) {
-            $path .= '&startkey=' . (string) $startKey;
-        }
+        $path = "/{$this->name}/_design/$design/_view/$view?" . http_build_query(
+            array_map(
+                "json_encode",
+                array_merge(
+                    array(
+                        'include_docs' => true
+                    ),
+                    $params
+                )
+            )
+        );
 
         $response = $this->conn->getClient()->request($path);
         if (200 !== $response->getStatusCode()) {
